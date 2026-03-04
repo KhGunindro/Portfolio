@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khuraijam Gunindro — The Conqueror's Portfolio</title>
+<meta name="description" content="Welcome to the kingdom of Khuraijam Gunindro, a realm of AI mastery, blockchain conquests, and machine learning triumphs. Explore the legend of a conqueror who has dominated the digital frontier with unparalleled skills and groundbreaking projects.">
+<link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Press+Start+2P&family=IM+Fell+English:ital@0;1&display=swap');
+
+  :root {
+    --day-sky1: #1a0a2e;
+    --day-sky2: #16213e;
+    --night-sky1: #0a0015;
+    --night-sky2: #000005;
+    --gold: #ffd700;
+    --dark-gold: #b8860b;
+    --parchment: #f4d03f;
+    --red: #c0392b;
+    --green: #27ae60;
+    --stone: #7f8c8d;
+    --dark-stone: #2c3e50;
+    --wood: #6b3a2a;
+    --ui-bg: rgba(15,10,30,0.92);
+    --border-color: #ffd700;
+    --text-primary: #ffd700;
+    --text-secondary: #e8c99a;
+    --pixel: 2px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Press Start 2P', monospace;
+    background: #0a0015;
+    color: var(--text-primary);
+    overflow-x: hidden;
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Crect x='8' y='0' width='4' height='20' fill='%23ffd700'/%3E%3Crect x='0' y='8' width='20' height='4' fill='%23ffd700'/%3E%3C/svg%3E") 10 10, crosshair;
+  }
+
+  /* ===== CANVAS BACKGROUND ===== */
+  #bgCanvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ===== DAY/NIGHT TOGGLE ===== */
+  #dayNightToggle {
+    position: fixed;
+    top: 20px; right: 20px;
+    z-index: 1000;
+    background: var(--ui-bg);
+    border: 3px solid var(--gold);
+    padding: 8px 14px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    image-rendering: pixelated;
+    box-shadow: 4px 4px 0 #000, inset 0 0 10px rgba(255,215,0,0.1);
+    transition: all 0.3s;
+    letter-spacing: 1px;
+  }
+  #dayNightToggle:hover {
+    background: rgba(255,215,0,0.15);
+    box-shadow: 4px 4px 0 #000, 0 0 15px var(--gold);
+    transform: translate(-1px,-1px);
+  }
+
+  /* ===== MUSIC PLAYER ===== */
+  #musicPlayer {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    z-index: 1000;
+    background: var(--ui-bg);
+    border: 3px solid var(--gold);
+    padding: 12px 16px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: var(--gold);
+    box-shadow: 4px 4px 0 #000;
+    min-width: 220px;
+  }
+  #musicPlayer .track-name {
+    font-size: 7px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #musicPlayer .controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .ctrl-btn {
+    background: none;
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .ctrl-btn:hover {
+    background: var(--gold);
+    color: #000;
+  }
+  #volumeSlider {
+    -webkit-appearance: none;
+    width: 80px;
+    height: 6px;
+    background: #333;
+    outline: none;
+    border: 1px solid var(--gold);
+  }
+  #volumeSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: var(--gold);
+    cursor: pointer;
+  }
+  #playPauseBtn { font-size: 12px; }
+
+  /* ===== PIXEL BORDER MIXIN ===== */
+  .pixel-box {
+    border: 4px solid var(--gold);
+    box-shadow: 4px 4px 0 #000, inset 0 0 0 2px rgba(255,215,0,0.1);
+    position: relative;
+  }
+  .pixel-box::before {
+    content: '';
+    position: absolute;
+    top: -8px; left: -8px; right: -8px; bottom: -8px;
+    border: 2px solid rgba(255,215,0,0.2);
+    pointer-events: none;
+  }
+
+  /* ===== HERO SECTION ===== */
+  #hero {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .hero-emblem {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 30px;
+    position: relative;
+    animation: floatAnim 3s ease-in-out infinite;
+  }
+
+  @keyframes floatAnim {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .hero-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(14px, 3vw, 28px);
+    color: var(--gold);
+    text-shadow: 0 0 20px var(--gold), 3px 3px 0 #000, 6px 6px 0 rgba(0,0,0,0.5);
+    line-height: 1.6;
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+    animation: textGlow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes textGlow {
+    from { text-shadow: 0 0 10px var(--gold), 3px 3px 0 #000; }
+    to   { text-shadow: 0 0 30px var(--gold), 0 0 60px #ffaa00, 3px 3px 0 #000; }
+  }
+
+  .hero-subtitle {
+    font-size: clamp(7px, 1.5vw, 11px);
+    color: var(--text-secondary);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    line-height: 2;
+  }
+
+  .hero-tagline {
+    font-size: 8px;
+    color: #aaa;
+    font-style: italic;
+    font-family: 'IM Fell English', serif;
+    font-size: 16px;
+    margin-bottom: 40px;
+    color: rgba(255,215,0,0.6);
+  }
+
+  .scroll-hint {
+    font-size: 7px;
+    color: var(--gold);
+    animation: blink 1s step-end infinite;
+    letter-spacing: 2px;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    z-index: 900;
+    background: rgba(5,3,15,0.95);
+    border-bottom: 3px solid var(--gold);
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px 20px;
+    box-shadow: 0 4px 20px rgba(255,215,0,0.2);
+    flex-wrap: wrap;
+  }
+  nav a {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: var(--gold);
+    text-decoration: none;
+    padding: 6px 10px;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+    position: relative;
+  }
+  nav a:hover {
+    border-color: var(--gold);
+    background: rgba(255,215,0,0.1);
+    box-shadow: 0 0 10px var(--gold);
+    transform: translateY(-2px);
+  }
+
+  /* ===== SECTIONS ===== */
+  section {
+    position: relative;
+    z-index: 10;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 80px 20px;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .section-banner {
+    display: inline-block;
+    background: var(--ui-bg);
+    border: 4px solid var(--gold);
+    padding: 12px 30px;
+    font-size: clamp(9px, 2vw, 14px);
+    color: var(--gold);
+    text-shadow: 2px 2px 0 #000;
+    box-shadow: 6px 6px 0 #000;
+    letter-spacing: 3px;
+    position: relative;
+  }
+  .section-banner::before, .section-banner::after {
+    content: '⚔';
+    margin: 0 12px;
+    font-size: 14px;
+  }
+
+  /* ===== ABOUT / STAT PANEL ===== */
+  .stat-panel {
+    background: var(--ui-bg);
+    border: 4px solid var(--gold);
+    box-shadow: 6px 6px 0 #000;
+    padding: 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media(max-width:600px){ .stat-panel { grid-template-columns:1fr; } }
+
+  .unit-portrait {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .portrait-frame {
+    width: 120px;
+    height: 120px;
+    border: 4px solid var(--gold);
+    box-shadow: 4px 4px 0 #000, inset 0 0 20px rgba(255,215,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    background: linear-gradient(135deg, #1a0a2e 0%, #0d0820 100%);
+    position: relative;
+    overflow: hidden;
+    animation: portraitShimmer 4s ease-in-out infinite;
+  }
+  @keyframes portraitShimmer {
+    0%,100% { box-shadow: 4px 4px 0 #000, inset 0 0 20px rgba(255,215,0,0.1); }
+    50% { box-shadow: 4px 4px 0 #000, inset 0 0 40px rgba(255,215,0,0.3), 0 0 20px var(--gold); }
+  }
+
+  .unit-name {
+    font-size: 8px;
+    color: var(--gold);
+    text-align: center;
+    letter-spacing: 1px;
+    line-height: 1.8;
+  }
+
+  .stat-bars { display: flex; flex-direction: column; gap: 12px; justify-content: center; }
+
+  .stat-row { display: flex; flex-direction: column; gap: 4px; }
+  .stat-label {
+    font-size: 6px;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .stat-bar-bg {
+    height: 12px;
+    background: #111;
+    border: 2px solid #444;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-bar-fill {
+    height: 100%;
+    position: relative;
+    transition: width 2s ease;
+  }
+  .stat-bar-fill.green { background: linear-gradient(90deg, #1a7a1a, #27ae60); }
+  .stat-bar-fill.blue  { background: linear-gradient(90deg, #1a4a8a, #3498db); }
+  .stat-bar-fill.red   { background: linear-gradient(90deg, #8a1a1a, #e74c3c); }
+  .stat-bar-fill.gold  { background: linear-gradient(90deg, #8a6a00, #f1c40f); }
+  .stat-bar-fill.purple{ background: linear-gradient(90deg, #4a1a8a, #9b59b6); }
+  .stat-bar-fill.cyan  { background: linear-gradient(90deg, #1a6a6a, #1abc9c); }
+
+  /* ===== EXPERIENCE — TECH TREE ===== */
+  .tech-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .exp-card {
+    background: var(--ui-bg);
+    border: 3px solid var(--gold);
+    box-shadow: 5px 5px 0 #000;
+    padding: 20px 25px;
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 20px;
+    align-items: start;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .exp-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.05), transparent);
+    transition: left 0.5s;
+  }
+  .exp-card:hover::after { left: 100%; }
+  .exp-card:hover {
+    border-color: #fff;
+    box-shadow: 5px 5px 0 var(--gold);
+    transform: translate(-2px,-2px);
+  }
+
+  .exp-icon {
+    width: 56px; height: 56px;
+    border: 3px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    background: rgba(255,215,0,0.05);
+    flex-shrink: 0;
+  }
+
+  .exp-title { font-size: 9px; color: var(--gold); margin-bottom: 6px; line-height: 1.5; }
+  .exp-company { font-size: 7px; color: var(--text-secondary); margin-bottom: 8px; }
+  .exp-date { font-size: 6px; color: #aaa; margin-bottom: 10px; }
+  .exp-desc { font-size: 6px; color: #ccc; line-height: 2.2; list-style: none; }
+  .exp-desc li::before { content: '▶ '; color: var(--gold); }
+
+  /* ===== PROJECTS — BUILDING CARDS ===== */
+  .buildings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .building-card {
+    background: var(--ui-bg);
+    border: 3px solid var(--gold);
+    box-shadow: 5px 5px 0 #000;
+    padding: 20px;
+    transition: all 0.3s;
+    position: relative;
+    cursor: pointer;
+  }
+  .building-card:hover {
+    box-shadow: 5px 5px 0 var(--gold), 0 0 20px rgba(255,215,0,0.2);
+    transform: translate(-3px,-3px);
+    border-color: #fff;
+  }
+
+  .building-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    display: block;
+    filter: drop-shadow(0 0 8px rgba(255,215,0,0.5));
+  }
+  .building-name { font-size: 8px; color: var(--gold); margin-bottom: 8px; line-height: 1.6; }
+  .building-desc { font-size: 6px; color: #bbb; line-height: 2.2; margin-bottom: 12px; }
+  .building-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .tag {
+    font-size: 5px;
+    padding: 3px 6px;
+    border: 1px solid;
+    letter-spacing: 1px;
+  }
+  .tag.blockchain { border-color: #e67e22; color: #e67e22; background: rgba(230,126,34,0.1); }
+  .tag.ai { border-color: #3498db; color: #3498db; background: rgba(52,152,219,0.1); }
+  .tag.web { border-color: #27ae60; color: #27ae60; background: rgba(39,174,96,0.1); }
+  .tag.ml { border-color: #9b59b6; color: #9b59b6; background: rgba(155,89,182,0.1); }
+  .tag.llm { border-color: #e74c3c; color: #e74c3c; background: rgba(231,76,60,0.1); }
+
+  /* ===== SKILLS — UNIT ROSTER ===== */
+  .unit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  .unit-card {
+    background: var(--ui-bg);
+    border: 2px solid #555;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .unit-card:hover {
+    border-color: var(--gold);
+    background: rgba(255,215,0,0.08);
+    box-shadow: 3px 3px 0 var(--gold);
+    transform: translate(-2px,-2px);
+  }
+  .unit-card .unit-emoji { font-size: 26px; display: block; margin-bottom: 8px; }
+  .unit-card .unit-type { font-size: 6px; color: var(--gold); margin-bottom: 4px; letter-spacing: 1px; }
+  .unit-card .unit-skills-list { font-size: 5px; color: #aaa; line-height: 2; }
+
+  /* ===== ACHIEVEMENTS ===== */
+  .achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+
+  .achievement-card {
+    background: var(--ui-bg);
+    border: 3px solid var(--dark-gold);
+    box-shadow: 4px 4px 0 #000;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s;
+  }
+  .achievement-card:hover {
+    border-color: var(--gold);
+    box-shadow: 4px 4px 0 var(--gold);
+    transform: translate(-2px,-2px);
+  }
+  .achievement-medal {
+    font-size: 36px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 8px gold);
+    animation: medalSpin 10s linear infinite;
+  }
+  @keyframes medalSpin { 0%,100%{filter:drop-shadow(0 0 5px gold)} 50%{filter:drop-shadow(0 0 20px gold) brightness(1.3)} }
+  .achievement-text .ach-title { font-size: 7px; color: var(--gold); margin-bottom: 6px; line-height: 1.5; }
+  .achievement-text .ach-desc { font-size: 6px; color: #aaa; line-height: 1.8; }
+
+  /* ===== CONTACT ===== */
+  .contact-panel {
+    background: var(--ui-bg);
+    border: 4px solid var(--gold);
+    box-shadow: 8px 8px 0 #000;
+    padding: 40px;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .contact-links { display: flex; flex-direction: column; gap: 14px; margin-top: 30px; }
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border: 2px solid #555;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 7px;
+    transition: all 0.3s;
+    letter-spacing: 1px;
+  }
+  .contact-link:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(255,215,0,0.05);
+    box-shadow: 3px 3px 0 var(--gold);
+    transform: translate(-2px,-2px);
+  }
+  .contact-link .link-icon { font-size: 18px; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 30px;
+    border-top: 3px solid var(--dark-gold);
+    font-size: 7px;
+    color: #555;
+    letter-spacing: 2px;
+  }
+
+  /* ===== PIXEL DIVIDER ===== */
+  .pixel-divider {
+    text-align: center;
+    font-size: 10px;
+    color: var(--dark-gold);
+    letter-spacing: 6px;
+    margin: 0 auto 40px;
+    opacity: 0.6;
+  }
+
+  /* ===== NOTIFICATION TOAST ===== */
+  #toast {
+    position: fixed;
+    top: 80px; left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: rgba(10,5,25,0.97);
+    border: 3px solid var(--gold);
+    padding: 12px 24px;
+    font-size: 7px;
+    color: var(--gold);
+    z-index: 9999;
+    transition: transform 0.4s;
+    box-shadow: 4px 4px 0 #000;
+    white-space: nowrap;
+    letter-spacing: 1px;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ===== SCROLL ANIMATIONS ===== */
+  .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s, transform 0.6s; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ===== DAY MODE ===== */
+  body.day-mode {
+    --ui-bg: rgba(245,235,200,0.95);
+    --text-primary: #4a2800;
+    --text-secondary: #6b3a00;
+    --border-color: #8b5e00;
+    --gold: #8b5e00;
+    --dark-gold: #5a3c00;
+  }
+  body.day-mode nav { background: rgba(240,220,160,0.98); border-color: #8b5e00; }
+  body.day-mode .exp-card, body.day-mode .building-card, body.day-mode .unit-card,
+  body.day-mode .achievement-card, body.day-mode .contact-panel, body.day-mode .stat-panel {
+    background: rgba(245,235,200,0.95);
+    color: #4a2800;
+  }
+  body.day-mode .exp-desc, body.day-mode .building-desc, body.day-mode .unit-skills-list,
+  body.day-mode .ach-desc, body.day-mode .exp-date { color: #7a5030; }
+  body.day-mode .stat-bar-bg { background: #d4b896; border-color: #8b6a3a; }
+
+  /* ===== PIXEL CORNERS ===== */
+  .corner-tl::before { content:''; position:absolute; top:-4px; left:-4px; width:10px; height:10px; background:var(--gold); }
+  .corner-tr::after  { content:''; position:absolute; top:-4px; right:-4px; width:10px; height:10px; background:var(--gold); }
+
+  /* Animated pixel border */
+  @keyframes borderFlow {
+    0% { border-color: var(--gold); }
+    25% { border-color: #ff6b35; }
+    50% { border-color: #fff; }
+    75% { border-color: #35b5ff; }
+    100% { border-color: var(--gold); }
+  }
+  .hero-title-wrap {
+    background: var(--ui-bg);
+    border: 4px solid var(--gold);
+    padding: 30px 40px;
+    box-shadow: 8px 8px 0 #000;
+    margin-bottom: 30px;
+    animation: borderFlow 6s linear infinite;
+    max-width: 800px;
+  }
+
+  /* Smoke/fire particles */
+  .particle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 5;
+    font-size: 12px;
+    animation: particleFloat 3s ease-out forwards;
+  }
+  @keyframes particleFloat {
+    0% { opacity:1; transform:translateY(0) scale(1); }
+    100% { opacity:0; transform:translateY(-100px) scale(0.5); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Background Canvas -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- Toast -->
+<div id="toast">⚔ QUEST UNLOCKED!</div>
+
+<!-- Day/Night Toggle -->
+<button id="dayNightToggle" onclick="toggleDayNight()">🌙 NIGHT</button>
+
+<!-- Navigation -->
+<nav>
+  <a href="#about"      onclick="playClick()">📜 ABOUT</a>
+  <a href="#experience" onclick="playClick()">⚔ EXPERIENCE</a>
+  <a href="#projects"   onclick="playClick()">🏰 PROJECTS</a>
+  <a href="#skills"     onclick="playClick()">🛡 SKILLS</a>
+  <a href="#achievements" onclick="playClick()">🏆 GLORY</a>
+  <a href="#contact"    onclick="playClick()">📯 CONTACT</a>
+</nav>
+
+<!-- Music Player -->
+<div id="musicPlayer">
+  <div class="track-name" id="trackName">♪ THE CONQUERORS — MAIN THEME</div>
+  <div class="controls">
+    <button class="ctrl-btn" id="playPauseBtn" onclick="togglePlay()">▶</button>
+    <button class="ctrl-btn" onclick="prevTrack()">◀◀</button>
+    <button class="ctrl-btn" onclick="nextTrack()">▶▶</button>
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.4" oninput="setVolume(this.value)">
+  </div>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-emblem">
+    <canvas id="emblemCanvas" width="120" height="120"></canvas>
+  </div>
+
+  <div class="hero-title-wrap">
+    <div class="hero-title">KHURAIJAM GUNINDRO</div>
+    <div class="hero-subtitle">
+      ⚔ AI RESEARCH ENTHUSIAST · MCA @ NIELIT IMPHAL ⚔<br>
+      🏰 BLOCKCHAIN · MACHINE LEARNING · LLM AGENTS 🏰
+    </div>
+  </div>
+
+  <div class="hero-tagline">"From the age of code, a conqueror of intelligent systems was born."</div>
+  <div class="scroll-hint">▼ SCROLL TO EXPLORE THE KINGDOM ▼</div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-header fade-in">
+    <div class="section-banner">UNIT INFO</div>
+  </div>
+  <div class="stat-panel fade-in">
+    <div class="unit-portrait">
+      <div class="portrait-frame">
+        <img src="assets/Portraits.png" alt="Unit Portrait" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="unit-name">
+        GUNINDRO<br>
+        ──────────<br>
+        CLASS: AI WIZARD<br>
+        RANK: CONQUEROR<br>
+        LOCATION: IMPHAL<br>
+        AGE: MCA GRADUATE
+      </div>
+    </div>
+    <div class="stat-bars">
+      <div class="stat-row">
+        <div class="stat-label"><span>PYTHON MASTERY</span><span>95/100</span></div>
+        <div class="stat-bar-bg"><div class="stat-bar-fill green" style="width:0%" data-target="95%"></div></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-label"><span>ML INTELLIGENCE</span><span>90/100</span></div>
+        <div class="stat-bar-bg"><div class="stat-bar-fill purple" style="width:0%" data-target="90%"></div></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-label"><span>LINUX DOMINANCE</span><span>92/100</span></div>
+        <div class="stat-bar-bg"><div class="stat-bar-fill cyan" style="width:0%" data-target="92%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-header fade-in">
+    <div class="section-banner">CAMPAIGN HISTORY</div>
+  </div>
+  <div class="pixel-divider fade-in">· · · · · · · · · · · · · · ·</div>
+  <div class="tech-tree">
+
+    <div class="exp-card fade-in">
+      <div class="exp-icon">🔬</div>
+      <div>
+        <div class="exp-title">LAB TECHNICIAN</div>
+        <div class="exp-company">NIELIT IMPHAL</div>
+        <div class="exp-date">OCT 2025 – PRESENT</div>
+        <ul class="exp-desc">
+          <li>Managing AI, electronics &amp; computing lab infrastructure</li>
+          <li>Assisting faculty with system setup &amp; data workflows</li>
+          <li>Maintaining Linux servers &amp; development environments</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exp-card fade-in">
+      <div class="exp-icon">📡</div>
+      <div>
+        <div class="exp-title">NSQF TRAINER — INDIAAI</div>
+        <div class="exp-company">IndiaAI Courses</div>
+        <div class="exp-date">AUG 2025 – PRESENT</div>
+        <ul class="exp-desc">
+          <li>Conducting AI/ML training under IndiaAI initiative</li>
+          <li>Designing curriculum for diverse learner groups</li>
+          <li>Mentoring students in Python, ML &amp; AI fundamentals</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exp-card fade-in">
+      <div class="exp-icon">👑</div>
+      <div>
+        <div class="exp-title">TECH LEAD — CYBRELLA 2025</div>
+        <div class="exp-company">NIELIT Imphal</div>
+        <div class="exp-date">FEB 2025</div>
+        <ul class="exp-desc">
+          <li>Led technical team for major tech event</li>
+          <li>Deployed official website with Nginx on Linux servers</li>
+          <li>Built React Native token app &amp; Python typing test</li>
+          <li>Managed GitHub collaboration &amp; code reviews</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exp-card fade-in">
+      <div class="exp-icon">🎨</div>
+      <div>
+        <div class="exp-title">DESIGN INTERN</div>
+        <div class="exp-company">Mobimp Imphal</div>
+        <div class="exp-date">MAY 2022 – JUL 2022</div>
+        <ul class="exp-desc">
+          <li>Built full-stack apps with ASP.NET MVC &amp; WebForms</li>
+          <li>Contributed to UI/UX design using Figma</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-header fade-in">
+    <div class="section-banner">CONSTRUCTED BUILDINGS</div>
+  </div>
+  <div class="pixel-divider fade-in">· · · · · · · · · · · · · · ·</div>
+  <div class="buildings-grid">
+
+    <div class="building-card fade-in" onclick="playClick()">
+      <div class="building-name">AGRICHAINS SMART CONTRACTS</div>
+      <div class="building-desc">Decentralized supply chain for agriculture. Built for Regen Hackathon 2025 at NIT Manipur — won 1st Runner-Up!</div>
+      <div class="building-tags">
+        <span class="tag blockchain">SOLIDITY</span>
+        <span class="tag blockchain">WEB3</span>
+        <span class="tag web">REACT</span>
+      </div>
+    </div>
+
+    <div class="building-card fade-in" onclick="playClick()">
+      <div class="building-name">BLOCKCHAINDRIVE</div>
+      <div class="building-desc">Decentralized file-sharing using Solidity, Hardhat, ethers.js, React 19 &amp; IPFS (Pinata) for secure document storage.</div>
+      <div class="building-tags">
+        <span class="tag blockchain">IPFS</span>
+        <span class="tag blockchain">HARDHAT</span>
+        <span class="tag web">REACT 19</span>
+      </div>
+    </div>
+
+    <div class="building-card fade-in" onclick="playClick()">
+      <div class="building-name">SMS GATEWAY FOR AGRICHAINS</div>
+      <div class="building-desc">Inbound SMS-trigger system enabling blockchain transactions in low-connectivity environments.</div>
+      <div class="building-tags">
+        <span class="tag blockchain">BLOCKCHAIN</span>
+        <span class="tag ai">SMS API</span>
+      </div>
+    </div>
+
+    <div class="building-card fade-in" onclick="playClick()">
+      <div class="building-name">PLUTCHIK CLASSIFIER</div>
+      <div class="building-desc">Fine-tuned RoBERTa model classifying news into Plutchik's 8 emotions using GoEmotions dataset &amp; FastAPI.</div>
+      <div class="building-tags">
+        <span class="tag ml">ROBERTA</span>
+        <span class="tag ml">PYTORCH</span>
+        <span class="tag ai">FASTAPI</span>
+      </div>
+    </div>
+
+    <div class="building-card fade-in" onclick="playClick()">
+      <div class="building-name">DISEASE CLASSIFICATION</div>
+      <div class="building-desc">ML pipeline classifying Asthma, Bronchiectasis &amp; COPD from GC-MS derived VOC breathomics data.</div>
+      <div class="building-tags">
+        <span class="tag ml">ML PIPELINE</span>
+        <span class="tag ml">CLASSIFICATION</span>
+      </div>
+    </div>
+
+    <div class="building-card fade-in" onclick="playClick()">
+      <div class="building-name">rPPG HEART RATE ESTIMATION</div>
+      <div class="building-desc">Remote photoplethysmography pipeline estimating heart rate from facial videos using spatio-temporal CNNs.</div>
+      <div class="building-tags">
+        <span class="tag ml">CNN</span>
+        <span class="tag ml">DEEP LEARNING</span>
+        <span class="tag ai">COMPUTER VISION</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-header fade-in">
+    <div class="section-banner">UNIT ROSTER</div>
+  </div>
+  <div class="pixel-divider fade-in">· · · · · · · · · · · · · · ·</div>
+  <div class="unit-grid">
+
+    <div class="unit-card fade-in" onclick="playClick()">
+      <div class="unit-type">LANGUAGE UNIT</div>
+      <div class="unit-skills-list">Python · JavaScript · C<br>Solidity · SQL</div>
+    </div>
+
+    <div class="unit-card fade-in" onclick="playClick()">
+      <div class="unit-type">FRAMEWORK UNIT</div>
+      <div class="unit-skills-list">React · ASP.NET<br>FastAPI · React Native</div>
+    </div>
+
+    <div class="unit-card fade-in" onclick="playClick()">
+      <div class="unit-type">AI / ML UNIT</div>
+      <div class="unit-skills-list">TensorFlow · Keras<br>CNNs · PyTorch<br>Transformers</div>
+    </div>
+
+    <div class="unit-card fade-in" onclick="playClick()">
+      <div class="unit-type">BLOCKCHAIN UNIT</div>
+      <div class="unit-skills-list">Ethereum · Hardhat<br>Solidity · IPFS<br>ethers.js</div>
+    </div>
+
+    <div class="unit-card fade-in" onclick="playClick()">
+      <div class="unit-type">LLM AGENT UNIT</div>
+      <div class="unit-skills-list">LangChain · Ollama<br>ChromaDB · MCP<br>Agentic Design</div>
+    </div>
+
+    <div class="unit-card fade-in" onclick="playClick()">
+      <div class="unit-type">DEVOPS UNIT</div>
+      <div class="unit-skills-list">Nginx · Linux Server<br>Git · Vim<br>Docker</div>
+    </div>
+
+    <div class="unit-card fade-in" onclick="playClick()">
+      <div class="unit-type">DESIGN UNIT</div>
+      <div class="unit-skills-list">Figma · Tailwind<br>Three.js · Shadcn UI</div>
+    </div>
+
+    <div class="unit-card fade-in" onclick="playClick()">
+      <div class="unit-type">DATA UNIT</div>
+      <div class="unit-skills-list">PostgreSQL · ChromaDB<br>IPFS · Pinata</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ACHIEVEMENTS -->
+<section id="achievements">
+  <div class="section-header fade-in">
+    <div class="section-banner">HALL OF GLORY</div>
+  </div>
+  <div class="pixel-divider fade-in">· · · · · · · · · · · · · · ·</div>
+  <div class="achievements-grid">
+
+    <div class="achievement-card fade-in">
+      <div class="achievement-medal">🥈</div>
+      <div class="achievement-text">
+        <div class="ach-title">1ST RUNNER-UP<br>REGEN HACKATHON 2025</div>
+        <div class="ach-desc">NIT Manipur · Agrichains Smart Contract Project · Blockchain + Agriculture</div>
+      </div>
+    </div>
+
+    <div class="achievement-card fade-in">
+      <div class="achievement-medal">🌍</div>
+      <div class="achievement-text">
+        <div class="ach-title">GLOBAL ENTREPRENEUR SUMMIT 2023</div>
+        <div class="ach-desc">IIT Kharagpur · International exposure in entrepreneurship &amp; innovation</div>
+      </div>
+    </div>
+
+    <div class="achievement-card fade-in">
+      <div class="achievement-medal">🎓</div>
+      <div class="achievement-text">
+        <div class="ach-title">MCA — MASTER OF COMPUTER APPLICATIONS</div>
+        <div class="ach-desc">NIELIT Imphal · Specialization in AI, Blockchain &amp; Systems Architecture</div>
+      </div>
+    </div>
+
+    <div class="achievement-card fade-in">
+      <div class="achievement-medal">📡</div>
+      <div class="achievement-text">
+        <div class="ach-title">INDIAAI CERTIFIED TRAINER</div>
+        <div class="ach-desc">NSQF-aligned AI education · Training next-gen developers in Manipur</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-header fade-in">
+    <div class="section-banner">SEND A RAVEN</div>
+  </div>
+  <div class="contact-panel fade-in pixel-box">
+    <div style="font-size:8px;color:var(--text-secondary);line-height:2.5;margin-bottom:10px;">
+      THE CONQUEROR AWAITS YOUR MESSAGE.<br>
+      CHOOSE YOUR MEANS OF COMMUNICATION:
+    </div>
+    <div class="contact-links">
+      <a class="contact-link" href="https://github.com/KhGunindro" target="_blank" onclick="playClick()">
+        <span class="link-icon">⚔</span>
+        <span>github.com/KhGunindro</span>
+      </a>
+      <a class="contact-link" href="#" onclick="playClick()">
+        <span class="link-icon">📍</span>
+        <span>Imphal West, Manipur, India</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="color:var(--gold);margin-bottom:8px;">⚔ KHURAIJAM GUNINDRO · THE CONQUEROR ⚔</div>
+  <div>BUILT WITH BLOOD, CODE & DETERMINATION · © 2026</div>
+  <div style="margin-top:8px;font-size:6px;opacity:0.4;">POWERED BY REACT · SOLIDITY · NEURAL NETWORKS · AND PURE WILL</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ============================================================
+// AUDIO ENGINE
+// ============================================================
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let ctx = null;
+let masterGain = null;
+let isPlaying = false;
+let currentTrack = 0;
+let musicSource = null;
+let scheduledNodes = [];
+
+function initAudio() {
+  if (!ctx) {
+    ctx = new AudioCtx();
+    masterGain = ctx.createGain();
+    masterGain.gain.value = 0.4;
+    masterGain.connect(ctx.destination);
+  }
+}
+
+// --- SOUND EFFECTS ---
+function playClick() {
+  initAudio();
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.connect(g); g.connect(masterGain);
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(880, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.08);
+  g.gain.setValueAtTime(0.15, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.15);
+}
+
+function playHover() {
+  initAudio();
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.connect(g); g.connect(masterGain);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(660, ctx.currentTime);
+  g.gain.setValueAtTime(0.05, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.06);
+}
+
+function playVictory() {
+  initAudio();
+  const notes = [523, 659, 784, 1047];
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.connect(g); g.connect(masterGain);
+    osc.type = 'square';
+    osc.frequency.value = freq;
+    const t = ctx.currentTime + i * 0.12;
+    g.gain.setValueAtTime(0.2, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    osc.start(t);
+    osc.stop(t + 0.35);
+  });
+}
+
+// ============================================================
+// --- MUSIC SYSTEM — YOUR CUSTOM TRACKS GO HERE ---
+// ============================================================
+//
+// HOW TO ADD YOUR OWN MUSIC:
+// ─────────────────────────────────────────────────────────────
+// 1. Place your audio files in the SAME folder as this HTML file.
+//    Supported formats: .mp3  .ogg  .wav  (MP3 recommended)
+//
+// 2. In the `tracks` array below, replace each `src` value with
+//    your actual filename. Example:
+//      src: 'my-epic-song.mp3'
+//
+// 3. Update the `name` value to whatever you want shown in the
+//    music player UI. Example:
+//      name: '♪ MY TRACK NAME'
+//
+// 4. You can add MORE tracks by copying one object block and
+//    adding it to the array (keep the trailing comma on each).
+//
+// 5. Set `loop: true` if you want the track to repeat forever,
+//    or `loop: false` to auto-advance to the next track.
+//
+// EXAMPLE of a fully filled-in tracks array:
+// ─────────────────────────────────────────────────────────────
+//   const tracks = [
+//     { name: '♪ CONQUERORS MAIN THEME', src: 'aoe_main.mp3',   loop: true  },
+//     { name: '♪ BATTLE MARCH',          src: 'aoe_battle.mp3', loop: true  },
+//     { name: '♪ MY OWN SONG',           src: 'mysong.mp3',     loop: false },
+//   ];
+// ─────────────────────────────────────────────────────────────
+
+const tracks = [
+
+  // ──────────────────────────────────────────────────────────
+  // TRACK 1ggVG — Second track (e.g. battle / action music)
+  // Replace 'YOUR_TRACK_2.mp3' with your actual filename
+  // ──────────────────────────────────────────────────────────
+  {
+    name: '♪ Lofi geek - miso',
+    src:  'assets/miso.mp3',   // <-- REPLACE THIS with e.g. 'battle_march.mp3'
+    loop: true
+  },
+
+  // ──────────────────────────────────────────────────────────
+  // TRACK 3 — Third track (e.g. ambient / exploration music)
+  // Replace 'YOUR_TRACK_3.mp3' with your actual filename
+  // ──────────────────────────────────────────────────────────
+  {
+    name: '♪ Lofi geek - keirei',
+    src:  'assets/keirei.mp3',   // <-- REPLACE THIS with e.g. 'silk_road.mp3'
+    loop: true
+  },
+
+  // ──────────────────────────────────────────────────────────
+  // TRACK 5 (OPTIONAL) — Add as many tracks as you like
+  // Copy this block and paste it above to add more tracks
+  // ──────────────────────────────────────────────────────────
+  // {
+  //   name: '♪ TRACK 5 — ADD YOUR MUSIC',
+  //   src:  'YOUR_TRACK_5.mp3',
+  //   loop: true
+  // },
+
+];
+
+// ============================================================
+// AUDIO PLAYER ENGINE (powered by HTML5 Audio — no changes needed below)
+// ============================================================
+
+let audioElement = null; // The active <audio> element
+
+function loadAndPlayTrack(index) {
+  // Stop whatever is currently playing
+  stopMusic();
+
+  const track = tracks[index];
+  if (!track) return;
+
+  // Update the player UI label
+  document.getElementById('trackName').textContent = track.name;
+
+  // ──────────────────────────────────────────────────────────
+  // This creates a native browser <audio> element and plays
+  // your file. It reads the `src` path you set in the tracks
+  // array above. The file must live next to this HTML file.
+  // ──────────────────────────────────────────────────────────
+  audioElement = new Audio(track.src);
+  audioElement.loop   = track.loop;
+  audioElement.volume = parseFloat(document.getElementById('volumeSlider').value);
+
+  // When the track ends (and loop is false), auto-advance
+  audioElement.addEventListener('ended', () => {
+    if (!track.loop) {
+      currentTrack = (currentTrack + 1) % tracks.length;
+      loadAndPlayTrack(currentTrack);
+    }
+  });
+
+  // Play — catches the browser autoplay block gracefully
+  audioElement.play().then(() => {
+    isPlaying = true;
+    document.getElementById('playPauseBtn').textContent = '⏸';
+  }).catch(() => {
+    // Browser blocked autoplay — user must click play manually
+    isPlaying = false;
+    document.getElementById('playPauseBtn').textContent = '▶';
+    showToast('▶ CLICK PLAY TO START MUSIC');
+  });
+}
+
+function stopMusic() {
+  if (audioElement) {
+    audioElement.pause();
+    audioElement.currentTime = 0;
+    audioElement = null;
+  }
+  // Also kill any leftover Web Audio nodes from old system
+  scheduledNodes.forEach(n => { try { n.stop(); } catch(e){} });
+  scheduledNodes = [];
+  isPlaying = false;
+  document.getElementById('playPauseBtn').textContent = '▶';
+}
+
+function togglePlay() {
+  initAudio(); // keep AudioContext alive for sound effects
+  if (isPlaying && audioElement) {
+    audioElement.pause();
+    isPlaying = false;
+    document.getElementById('playPauseBtn').textContent = '▶';
+  } else if (!isPlaying && audioElement) {
+    // Resume a paused track
+    audioElement.play();
+    isPlaying = true;
+    document.getElementById('playPauseBtn').textContent = '⏸';
+  } else {
+    // Nothing loaded yet — start from currentTrack
+    loadAndPlayTrack(currentTrack);
+  }
+}
+
+function nextTrack() {
+  initAudio();
+  currentTrack = (currentTrack + 1) % tracks.length;
+  loadAndPlayTrack(currentTrack);
+  playClick();
+  showToast('▶ ' + tracks[currentTrack].name);
+}
+
+function prevTrack() {
+  initAudio();
+  currentTrack = (currentTrack - 1 + tracks.length) % tracks.length;
+  loadAndPlayTrack(currentTrack);
+  playClick();
+  showToast('◀ ' + tracks[currentTrack].name);
+}
+
+function setVolume(v) {
+  // Updates both the Web Audio master gain (sound effects)
+  // and the active HTML5 audio element (your music tracks)
+  if (masterGain) masterGain.gain.value = parseFloat(v);
+  if (audioElement) audioElement.volume = parseFloat(v);
+}
+
+// ============================================================
+// STARRY NIGHT CANVAS BACKGROUND
+// ============================================================
+const canvas = document.getElementById('bgCanvas');
+const bctx = canvas.getContext('2d');
+let stars = [];
+let shootingStars = [];
+let isDay = false;
+let dayProgress = 0; // 0=night, 1=day
+let animFrame;
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  generateStars();
+}
+
+function generateStars() {
+  stars = [];
+  const count = Math.floor((canvas.width * canvas.height) / 3000);
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height * 0.85,
+      r: Math.random() * 2.2 + 0.3,
+      twinkle: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.03 + 0.01,
+      color: Math.random() < 0.1 ? '#aaddff' : (Math.random() < 0.05 ? '#ffddaa' : '#ffffff'),
+      type: Math.random() < 0.03 ? 'pixel' : 'circle'
+    });
+  }
+}
+
+function spawnShootingStar() {
+  if (Math.random() < 0.003 && !isDay) {
+    shootingStars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height * 0.4,
+      vx: (Math.random() * 4 + 3) * (Math.random() < 0.5 ? 1 : -1),
+      vy: Math.random() * 3 + 1,
+      life: 1,
+      decay: Math.random() * 0.02 + 0.015,
+      length: Math.random() * 80 + 40
+    });
+  }
+}
+
+function drawBackground() {
+  const t = isDay ? Math.min(dayProgress + 0.01, 1) : Math.max(dayProgress - 0.008, 0);
+  dayProgress = t;
+
+  // Sky gradient
+  const nightTop = '#0a0015', nightBot = '#08001a';
+  const dayTop = '#1a3a6e', dayBot = '#2a5a8e';
+
+  const r1 = lerpColor(nightTop, dayTop, t);
+  const r2 = lerpColor(nightBot, dayBot, t);
+
+  const grad = bctx.createLinearGradient(0,0,0,canvas.height);
+  grad.addColorStop(0, r1);
+  grad.addColorStop(0.7, r2);
+  grad.addColorStop(1, isDay ? '#4a2a10' : '#050010');
+  bctx.fillStyle = grad;
+  bctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Moon or Sun
+  if (!isDay || t < 0.5) {
+    const moonAlpha = 1 - t * 2;
+    bctx.save();
+    bctx.globalAlpha = Math.max(0, moonAlpha);
+    drawPixelMoon(canvas.width * 0.15, canvas.height * 0.12, 30);
+    bctx.restore();
+  }
+  if (isDay || t > 0.3) {
+    const sunAlpha = Math.max(0, (t - 0.3) * 1.4);
+    bctx.save();
+    bctx.globalAlpha = Math.min(1, sunAlpha);
+    drawPixelSun(canvas.width * 0.8, canvas.height * 0.1, 28);
+    bctx.restore();
+  }
+
+  // Stars
+  const starAlpha = 1 - t;
+  if (starAlpha > 0.01) {
+    bctx.save();
+    bctx.globalAlpha = starAlpha;
+    stars.forEach(s => {
+      s.twinkle += s.speed;
+      const brightness = 0.5 + 0.5 * Math.sin(s.twinkle);
+
+      if (s.type === 'pixel') {
+        bctx.fillStyle = s.color;
+        bctx.globalAlpha = starAlpha * brightness;
+        bctx.fillRect(Math.floor(s.x), Math.floor(s.y), 2, 2);
+        bctx.fillRect(Math.floor(s.x+2), Math.floor(s.y+1), 2, 1);
+        bctx.fillRect(Math.floor(s.x+1), Math.floor(s.y+2), 2, 2);
+      } else {
+        bctx.globalAlpha = starAlpha * brightness;
+        bctx.fillStyle = s.color;
+        bctx.beginPath();
+        bctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        bctx.fill();
+        // Glow
+        if (s.r > 1.5) {
+          const g = bctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 4);
+          g.addColorStop(0, s.color + '88');
+          g.addColorStop(1, 'transparent');
+          bctx.fillStyle = g;
+          bctx.beginPath();
+          bctx.arc(s.x, s.y, s.r * 4, 0, Math.PI * 2);
+          bctx.fill();
+        }
+      }
+    });
+    bctx.restore();
+  }
+
+  // Shooting stars
+  spawnShootingStar();
+  shootingStars = shootingStars.filter(ss => ss.life > 0);
+  shootingStars.forEach(ss => {
+    bctx.save();
+    bctx.globalAlpha = ss.life * starAlpha;
+    const grad2 = bctx.createLinearGradient(ss.x, ss.y, ss.x - ss.vx * ss.length / 5, ss.y - ss.vy * ss.length / 5);
+    grad2.addColorStop(0, 'rgba(255,255,255,0.9)');
+    grad2.addColorStop(1, 'transparent');
+    bctx.strokeStyle = grad2;
+    bctx.lineWidth = 2;
+    bctx.beginPath();
+    bctx.moveTo(ss.x, ss.y);
+    bctx.lineTo(ss.x - ss.vx * ss.length / 5, ss.y - ss.vy * ss.length / 5);
+    bctx.stroke();
+    bctx.restore();
+    ss.x += ss.vx;
+    ss.y += ss.vy;
+    ss.life -= ss.decay;
+  });
+
+  // Pixel ground / silhouette
+  drawCastleSilhouette();
+
+  requestAnimationFrame(drawBackground);
+}
+
+function drawPixelMoon(cx, cy, r) {
+  const px = 6;
+  for (let y = -r; y <= r; y += px) {
+    for (let x = -r; x <= r; x += px) {
+      if (x*x + y*y <= r*r) {
+        const shadow = (x + 10)*(x+10) + y*y <= (r*0.7)*(r*0.7);
+        bctx.fillStyle = shadow ? '#c8c8e0' : '#fffde8';
+        bctx.fillRect(cx + x, cy + y, px-1, px-1);
+      }
+    }
+  }
+  // Glow
+  const glow = bctx.createRadialGradient(cx, cy, r, cx, cy, r * 3);
+  glow.addColorStop(0, 'rgba(220,220,255,0.15)');
+  glow.addColorStop(1, 'transparent');
+  bctx.fillStyle = glow;
+  bctx.beginPath();
+  bctx.arc(cx, cy, r * 3, 0, Math.PI * 2);
+  bctx.fill();
+}
+
+function drawPixelSun(cx, cy, r) {
+  // Rays
+  for (let a = 0; a < 360; a += 45) {
+    const rad = a * Math.PI / 180;
+    bctx.strokeStyle = '#ffdd4455';
+    bctx.lineWidth = 4;
+    bctx.beginPath();
+    bctx.moveTo(cx + Math.cos(rad) * (r + 5), cy + Math.sin(rad) * (r + 5));
+    bctx.lineTo(cx + Math.cos(rad) * (r + 20), cy + Math.sin(rad) * (r + 20));
+    bctx.stroke();
+  }
+  // Body
+  const px = 6;
+  for (let y = -r; y <= r; y += px) {
+    for (let x = -r; x <= r; x += px) {
+      if (x*x + y*y <= r*r) {
+        bctx.fillStyle = x*x + y*y <= (r*0.5)*(r*0.5) ? '#fffaaa' : '#ffcc00';
+        bctx.fillRect(cx + x, cy + y, px-1, px-1);
+      }
+    }
+  }
+  const glow = bctx.createRadialGradient(cx, cy, r, cx, cy, r * 4);
+  glow.addColorStop(0, 'rgba(255,220,0,0.2)');
+  glow.addColorStop(1, 'transparent');
+  bctx.fillStyle = glow;
+  bctx.beginPath();
+  bctx.arc(cx, cy, r * 4, 0, Math.PI * 2);
+  bctx.fill();
+}
+
+function drawCastleSilhouette() {
+  const w = canvas.width, h = canvas.height;
+  const groundY = h * 0.88;
+  const col = isDay ? 'rgba(30,15,5,0.6)' : 'rgba(10,5,25,0.8)';
+  bctx.fillStyle = col;
+
+  // Ground
+  bctx.fillRect(0, groundY, w, h);
+
+  // Left castle
+  const drawTower = (x, tw, th, mh) => {
+    bctx.fillRect(x, groundY - th, tw, th);
+    // Battlements
+    for (let i = 0; i < tw; i += 12) {
+      if ((i/12)%2===0) bctx.fillRect(x + i, groundY - th - 12, 10, 12);
+    }
+    // Gate
+    bctx.clearRect(x + tw/2 - 10, groundY - mh, 20, mh);
+    bctx.fillStyle = isDay ? 'rgba(40,20,5,0.8)' : 'rgba(5,2,15,0.8)';
+    bctx.beginPath();
+    bctx.arc(x + tw/2, groundY - mh, 10, Math.PI, 0);
+    bctx.fill();
+    bctx.fillStyle = col;
+  };
+
+  drawTower(20, 80, 120, 40);
+  drawTower(120, 140, 90, 35);
+
+  // Right castle
+  drawTower(w - 100, 80, 130, 40);
+  drawTower(w - 250, 150, 100, 38);
+
+  // Trees (pixel style)
+  [[300, groundY - 20],[350, groundY - 10],[w-300,groundY-20],[w-350,groundY-15]].forEach(([tx,ty]) => {
+    bctx.fillStyle = isDay ? 'rgba(20,40,10,0.7)' : 'rgba(5,15,5,0.9)';
+    // Trunk
+    bctx.fillRect(tx - 4, ty, 8, 20);
+    // Canopy (pixel triangle)
+    [[0,-20,20],[0,-35,15],[0,-48,10]].forEach(([ox,oy,size]) => {
+      bctx.fillRect(tx + ox - size, ty + oy, size*2, 16);
+    });
+  });
+}
+
+function lerpColor(a, b, t) {
+  const ah = parseInt(a.replace('#',''), 16);
+  const bh = parseInt(b.replace('#',''), 16);
+  const ar = (ah >> 16) & 0xff, ag = (ah >> 8) & 0xff, ab2 = ah & 0xff;
+  const br = (bh >> 16) & 0xff, bg = (bh >> 8) & 0xff, bb = bh & 0xff;
+  const rr = Math.round(ar + (br - ar) * t);
+  const rg = Math.round(ag + (bg - ag) * t);
+  const rb = Math.round(ab2 + (bb - ab2) * t);
+  return `rgb(${rr},${rg},${rb})`;
+}
+
+// ============================================================
+// EMBLEM CANVAS (pixel sword/shield)
+// ============================================================
+function drawEmblem() {
+  const ec = document.getElementById('emblemCanvas');
+  const ectx = ec.getContext('2d');
+  const w = 120, h = 120;
+  ectx.clearRect(0,0,w,h);
+
+  // Shield
+  ectx.fillStyle = '#1a0a2e';
+  ectx.fillRect(20, 10, 80, 90);
+  ectx.fillStyle = '#ffd700';
+  ectx.fillRect(20, 10, 80, 6);
+  ectx.fillRect(20, 10, 6, 90);
+  ectx.fillRect(94, 10, 6, 90);
+  ectx.fillRect(56, 94, 8, 16);
+
+  // Cross on shield
+  ectx.fillStyle = '#c0392b';
+  ectx.fillRect(54, 20, 12, 60);
+  ectx.fillRect(30, 44, 60, 12);
+
+  // Corner ornaments
+  [[26,16],[88,16],[26,78],[88,78]].forEach(([x,y]) => {
+    ectx.fillStyle = '#ffd700';
+    ectx.fillRect(x, y, 8, 8);
+  });
+
+  // Animated glow
+  const grd = ectx.createRadialGradient(60, 60, 10, 60, 60, 60);
+  grd.addColorStop(0, 'transparent');
+  grd.addColorStop(0.7, 'transparent');
+  grd.addColorStop(1, 'rgba(255,215,0,0.2)');
+  ectx.fillStyle = grd;
+  ectx.fillRect(0,0,w,h);
+}
+
+// ============================================================
+// DAY/NIGHT TOGGLE
+// ============================================================
+function toggleDayNight() {
+  initAudio();
+  isDay = !isDay;
+  document.getElementById('dayNightToggle').textContent = isDay ? '☀ DAY' : '🌙 NIGHT';
+  document.body.classList.toggle('day-mode', isDay);
+  playClick();
+  showToast(isDay ? '☀ DAWN BREAKS OVER THE KINGDOM' : '🌙 NIGHT FALLS UPON THE REALM');
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// SCROLL ANIMATIONS
+// ============================================================
+function checkFadeIn() {
+  document.querySelectorAll('.fade-in').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.92) {
+      el.classList.add('visible');
+      // Animate stat bars on entry
+      el.querySelectorAll('.stat-bar-fill[data-target]').forEach(bar => {
+        setTimeout(() => { bar.style.width = bar.dataset.target; }, 200);
+      });
+    }
+  });
+}
+
+// ============================================================
+// PARTICLE EFFECTS ON CLICK
+// ============================================================
+document.addEventListener('click', (e) => {
+  const emojis = ['⚔','🔥','✨','💥','⚡','🌟'];
+  for (let i = 0; i < 3; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    p.style.left = (e.clientX + (Math.random()-0.5)*30) + 'px';
+    p.style.top  = (e.clientY + (Math.random()-0.5)*30) + 'px';
+    p.style.animationDelay = (Math.random() * 0.2) + 's';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 3500);
+  }
+});
+
+// ============================================================
+// NAV HOVER SOUNDS
+// ============================================================
+document.querySelectorAll('nav a').forEach(a => {
+  a.addEventListener('mouseenter', () => playHover());
+});
+
+// ============================================================
+// SECTION ENTRY TOASTS
+// ============================================================
+const sectionToasts = {
+  'about':        '📜 VIEWING UNIT STATISTICS',
+  'experience':   '⚔ CAMPAIGN HISTORY UNLOCKED',
+  'projects':     '🏰 BUILDINGS DISCOVERED',
+  'skills':       '🛡 UNIT ROSTER REVEALED',
+  'achievements': '🏆 HALL OF GLORY ENTERED',
+  'contact':      '📯 COMMUNICATION TOWER ACTIVE'
+};
+let lastSection = '';
+const sectionObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && e.target.id && sectionToasts[e.target.id] && lastSection !== e.target.id) {
+      lastSection = e.target.id;
+      showToast(sectionToasts[e.target.id]);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('section[id]').forEach(s => sectionObserver.observe(s));
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('resize', resize);
+window.addEventListener('scroll', checkFadeIn);
+resize();
+drawEmblem();
+drawBackground();
+checkFadeIn();
+
+// ──────────────────────────────────────────────────────────────
+// Auto-start music on first user interaction (browser policy
+// requires a user gesture before audio can play).
+// Once you've added your track files, music will begin playing
+// automatically when the visitor first clicks anywhere.
+// ──────────────────────────────────────────────────────────────
+document.addEventListener('click', () => {
+  if (!isPlaying) {
+    loadAndPlayTrack(currentTrack);
+  }
+}, { once: true });
+
+// Victory toast on load
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    showToast('⚔ WELCOME, CONQUEROR. YOUR KINGDOM AWAITS.');
+  }, 1000);
+});
+</script>
+</body>
+</html>
